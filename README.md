@@ -67,7 +67,7 @@ Consulte la [documentación de implementación de Next.js](https://nextjs.org/do
 
 ## Bases de datos
 
-En la carpeta database, se encuentra un [archivo sql](https://github.com/ErunamoJAZZ/servicios-nube-proyecto-2024/blob/main/database/ddl-estudiante.sql), el cual tiene el script para crear la tabla y registrar los datos dummy en la bases de datos.
+En la carpeta database, se encuentra un [archivo sql](https://github.com/adatapoint/servicios-nube-proyecto-2025/blob/main/database/ddl-estudiante.sql), el cual tiene el script para crear la tabla y registrar los datos dummy en la bases de datos.
 
 ## Imágenes del Bucket S3
 
