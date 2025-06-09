@@ -1,4 +1,4 @@
-const LOAD_BALANCER_IFRAME_URL = process.env.LOAD_BALANCER_IFRAME_URL || 'https://www.google.com';
+const LOAD_BALANCER_URL = process.env.LOAD_BALANCER_URL || 'https://info.cern.ch';
 
 
 /** @type {import('next').NextConfig} */
@@ -9,7 +9,7 @@ const nextConfig = {
     return [
       {
         source: '/proxy/:path*',
-        destination: `${LOAD_BALANCER_IFRAME_URL}/:path*`,
+        destination: `${LOAD_BALANCER_URL}/:path*`,
       },
     ]
   },
