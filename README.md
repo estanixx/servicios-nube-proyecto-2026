@@ -43,7 +43,7 @@ bun dev
 
 Acceda a [http://localhost:3000](http://localhost:3000) para visualizar los resultados en el entorno local.
 
-El proyecto utiliza una base de datos PostgreSQL, un Bucket de S3, y un par de servicios Lambda. Puede encontrar ejemplos en la carpeta "lambda". No es obligatorio utilizar estos ejemplos, pero pueden servir como referencia.
+El proyecto utiliza una base de datos PostgreSQL, un Bucket de S3, y un par de servicios Lambda.
 
 Además, se debe recordar del requerimiento denominado "Balanceador de carga ", que implica el uso de una URL que apunta a un balanceador de carga. Esta página se carga a través de un proxy interno y se muestra en un iFrame. 
 
