@@ -10,7 +10,7 @@ export default function Home() {
       <Container>
         <p>
           Esta página de ejemplo permitirá evaluar lo aprendido
-          en el curso de Servicios en la nube, 2025-1.
+          en el curso de Servicios en la nube, 2025-2.
         </p>
         <p>
           El objetivo es hacer que cada una de las pestañas de
