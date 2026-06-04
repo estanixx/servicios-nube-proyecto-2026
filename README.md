@@ -76,3 +76,151 @@ En el siguiente [link](https://drive.google.com/drive/folders/1lZPTUXAaDkVg0PWpy
 ## Errores en este proyecto
 
 Si detecta algún error en este proyecto, le instamos a informarlo a través de los canales oficiales del curso. También estamos abiertos a recibir Pull Requests, aunque no se garantiza su aceptación.
+
+---
+
+## Despliegue de Infraestructura con Terraform
+
+Esta sección describe cómo desplegar la infraestructura en AWS utilizando Terraform.
+
+### Requisitos Previos
+
+1. **Cuenta de AWS** con permisos para crear recursos (EC2, RDS, Lambda, API Gateway, S3, VPC, etc.)
+2. **AWS CLI** configurada con credenciales (`aws configure`)
+3. **Terraform** instalado (versión >= 1.5.0)
+
+### Paso 1: Configurar el Backend de Terraform
+
+Por seguridad, las credenciales del backend (bucket S3 para estado) no están en el código. Copie el archivo de ejemplo:
+
+```bash
+cp terraform/backend.tf.example terraform/backend.tf
+```
+
+Edite `terraform/backend.tf` y reemplace los valores:
+
+```hcl
+terraform {
+  backend "s3" {
+    bucket       = "NOMBRE-DE-SU-BUCKET"   # Cree un bucket S3 para estado
+    key          = "ruta/al/estado.tfstate"
+    region       = "us-east-1"
+    use_lockfile = true
+    encrypt      = true
+  }
+}
+```
+
+### Paso 2: Inicializar Terraform
+
+```bash
+cd terraform
+terraform init
+```
+
+### Paso 3: Variables de Configuración
+
+Cree un archivo `terraform/terraform.tfvars` con sus valores personalizados:
+
+```hcl
+# IP desde la cual permitirá acceso SSH (su IP actual)
+office_ip = "SU_IP/32"
+
+# Nombre del proyecto (usado para etiquetar recursos)
+project_name = "nexacloud"
+
+# Puerto SSH no estándar
+ssh_port = 2222
+
+# Configuración de EC2
+ec2_instance_type  = "t3.micro"
+ec2_min_size        = 2
+ec2_max_size        = 5
+ec2_desired_capacity = 2
+ec2_key_pair        = "NOMBRE_DE_SU_KEY_PAIR"
+
+# Configuración de RDS
+rds_instance_class = "db.t3.micro"
+rds_allocated_storage = 20
+
+# Email para alertas SNS
+alert_email = "su-email@ejemplo.com"
+```
+
+### Paso 4: Planificar y Aplicar
+
+```bash
+# Ver los cambios que se aplicarán
+terraform plan
+
+# Desplegar la infraestructura
+terraform apply
+```
+
+### Paso 5: Configurar Variables de Lambda
+
+Una vez desplegada la infraestructura, debe configurar las variables de entorno de las funciones Lambda. Estas no se pueden configurar vía Terraform en tiempo de ejecución, así que use AWS CLI:
+
+```bash
+# Obtener información de los recursos creados
+terraform output
+
+# Configurar variables para InsertStudentLambda
+aws lambda update-function-configuration \
+  --function-name nexacloud-insert-student \
+  --environment Variables='{
+    "DB_HOST":"ENDPOINT_RDS",
+    "DB_PORT":"9876",
+    "DB_USER":"nexacloud_admin",
+    "DB_PASSWORD":"SU_PASSWORD",
+    "DB_NAME":"nexaclouddb",
+    "API_KEY":"SU_API_KEY"
+  }'
+
+# Configurar variables para ServeImagesLambda
+aws lambda update-function-configuration \
+  --function-name nexacloud-serve-images \
+  --environment Variables='{
+    "S3_BUCKET_NAME":"NOMBRE_DEL_BUCKET_S3",
+    "API_KEY":"SU_API_KEY"
+  }'
+```
+
+### Paso 6: Cargar Imágenes al Bucket S3
+
+1. Descargue las imágenes del [drive compartido](https://drive.google.com/drive/folders/1lZPTUXAaDkVg0PWpys5wQ3OcJbO-4V9f?usp=share_link)
+2. Cárguelas al bucket S3 creado:
+
+```bash
+aws s3 cp ./imagenes/ s3://NOMBRE_DEL_BUCKET_S3/images/ --recursive
+```
+
+### Recursos CREADOS
+
+El despliegue crea los siguientes recursos en AWS:
+
+| Recurso | Descripción |
+|---------|-------------|
+| VPC | Virtual Private Cloud con CIDR 10.0.0.0/16 |
+| Subnets | 2 públicas + 2 privadas en 2 AZs |
+| RDS PostgreSQL | Base de datos con puerto 9876 |
+| S3 Bucket | Almacenamiento para imágenes de empleados |
+| Lambda (Insert Student) | Función para insertar estudiantes |
+| Lambda (Serve Images) | Función para servir imágenes vía URL prefirmada |
+| API Gateway | API REST con endpoints /estudiante e /images |
+| EC2 ASG | Auto Scaling Group con instancias t3.micro |
+| Load Balancer | Application Load Balancer |
+| CloudWatch | Dashboard, logs y alarmas |
+| SNS | Tema para alertas por email |
+
+### Destruir la Infraestructura
+
+Para eliminar todos los recursos:
+
+```bash
+terraform destroy
+```
+
+**Nota:** Antes de destruir, asegúrese de:
+1. Vaciar el bucket S3: `aws s3 rm s3://NOMBRE_BUCKET --recursive`
+2. Hacer backup de cualquier dato importante en RDS
