@@ -3,7 +3,10 @@
 # =============================================================================
 
 data "aws_iam_policy_document" "s3_employee_images_policy" {
-  # Deny all public access
+  # Denegar acceso público (fuera de la cuenta). El Deny explícito sin condición
+  # bloqueaba también al IAM role de la Lambda porque en AWS un Deny siempre
+  # gana sobre cualquier Allow. Se usa aws:PrincipalAccount para excluir la
+  # cuenta propia del Deny.
   statement {
     sid    = "DenyPublicAccess"
     effect = "Deny"
@@ -24,31 +27,10 @@ data "aws_iam_policy_document" "s3_employee_images_policy" {
       aws_s3_bucket.employee_images.arn,
       "${aws_s3_bucket.employee_images.arn}/*"
     ]
-  }
-
-  # Allow any authenticated AWS principal (Lambda IAM role, etc.)
-  statement {
-    sid    = "AllowAuthenticatedAccess"
-    effect = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-
-    actions = [
-      "s3:GetObject",
-      "s3:ListBucket"
-    ]
-
-    resources = [
-      aws_s3_bucket.employee_images.arn,
-      "${aws_s3_bucket.employee_images.arn}/*"
-    ]
 
     condition {
-      test     = "StringEquals"
-      variable = "aws:sourceAccount"
+      test     = "StringNotEquals"
+      variable = "aws:PrincipalAccount"
       values   = [data.aws_caller_identity.current.account_id]
     }
   }
