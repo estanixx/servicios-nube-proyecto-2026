@@ -26,7 +26,7 @@ resource "aws_lambda_function" "insert_student" {
   environment {
     variables = {
       API_KEY   = var.api_key
-      DB_HOST   = aws_db_instance.main.endpoint
+      DB_HOST   = aws_db_instance.main.address
       DB_PORT   = tostring(var.rds_port)
       DB_NAME   = var.rds_db_name
       DB_USER   = var.rds_username
