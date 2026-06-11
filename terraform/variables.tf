@@ -116,13 +116,6 @@ variable "rds_storage_type" {
 # EC2 Configuration
 # =============================================================================
 
-# Note: ec2_ami_id is kept for reference but launch template now uses data source
-# data "aws_ami" "amazon_linux_2023" to find the latest AL2023 AMI
-variable "ec2_ami_id" {
-  description = "AMI ID for EC2 instances (deprecated - now uses data source)"
-  type        = string
-  default     = "" # No default - should use data source or provide explicit AMI
-}
 
 variable "ec2_instance_type" {
   description = "EC2 instance type"
