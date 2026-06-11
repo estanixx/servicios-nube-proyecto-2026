@@ -65,7 +65,7 @@ variable "rds_port" {
 variable "rds_engine_version" {
   description = "PostgreSQL engine version"
   type        = string
-  default     = "16.9"
+  default     = "16.4"
 }
 
 variable "rds_instance_class" {

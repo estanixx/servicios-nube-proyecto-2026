@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-yum update -y
-yum install -y nginx
+dnf update -y
+dnf install -y nginx
 
 # Cambiar puerto SSH a 2222 (requerido por security group)
 sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config
