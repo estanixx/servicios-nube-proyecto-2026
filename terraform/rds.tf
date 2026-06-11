@@ -49,8 +49,7 @@ resource "aws_db_instance" "main" {
   publicly_accessible                 = false
   iam_database_authentication_enabled = true
 
-  skip_final_snapshot       = false
-  final_snapshot_identifier = "${local.name_prefix}-final-snapshot"
+  skip_final_snapshot = true
   copy_tags_to_snapshot     = true
 
   tags = {
