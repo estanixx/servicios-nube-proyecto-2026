@@ -2,11 +2,6 @@
 # Variables - NexaCloud AWS Infrastructure
 # =============================================================================
 
-variable "office_ip" {
-  description = "Office IP CIDR for SSH access"
-  type        = string
-  default     = "152.203.67.246/32"
-}
 
 variable "project_name" {
   description = "Project name for resource naming and tags"
@@ -116,15 +111,6 @@ variable "rds_storage_type" {
   default     = "gp3"
 }
 
-# =============================================================================
-# Security Group Configuration
-# =============================================================================
-
-variable "ssh_port" {
-  description = "Non-default SSH port"
-  type        = number
-  default     = 2222
-}
 
 # =============================================================================
 # EC2 Configuration
@@ -144,11 +130,6 @@ variable "ec2_instance_type" {
   default     = "t3.micro"
 }
 
-variable "ec2_key_pair" {
-  description = "EC2 key pair name for SSH access"
-  type        = string
-  default     = "nexacloud-key"
-}
 
 variable "ec2_min_size" {
   description = "Minimum number of EC2 instances in ASG"
