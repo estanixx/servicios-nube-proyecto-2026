@@ -3,10 +3,14 @@
 # =============================================================================
 
 variable "rds_password" {
-  description = "Master password for RDS instance"
+  description = "Master password for RDS instance. Set via TF_VAR_rds_password o terraform.tfvars"
   type        = string
   sensitive   = true
-  default     = ""
+
+  validation {
+    condition     = length(var.rds_password) >= 8
+    error_message = "rds_password debe tener al menos 8 caracteres."
+  }
 }
 
 resource "aws_db_subnet_group" "main" {
@@ -57,7 +61,7 @@ resource "aws_db_instance" "main" {
 resource "aws_secretsmanager_secret" "rds_credentials" {
   name                    = "${local.name_prefix}-rds-credentials"
   description             = "RDS PostgreSQL master credentials for ${local.name_prefix}"
-  recovery_window_in_days = 7
+  recovery_window_in_days = 0
 
   tags = {
     Name = "${local.name_prefix}-rds-secrets"

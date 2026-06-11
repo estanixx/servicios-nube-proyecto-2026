@@ -11,6 +11,16 @@ for cmd in terraform aws npm; do
   command -v "$cmd" >/dev/null || { echo "ERROR: '$cmd' no encontrado." >&2; exit 1; }
 done
 
+# Validar variables requeridas
+if [ -z "${TF_VAR_rds_password:-}" ] && ! grep -q "rds_password" "$TERRAFORM_DIR/terraform.tfvars" 2>/dev/null; then
+  echo "ERROR: rds_password no configurado. Usa: export TF_VAR_rds_password='tu-password'" >&2
+  exit 1
+fi
+
+if [ -z "${TF_VAR_alert_email:-}" ] && ! grep -q "alert_email" "$TERRAFORM_DIR/terraform.tfvars" 2>/dev/null; then
+  echo "WARN: alert_email no configurado — las alertas SNS no enviarán email."
+fi
+
 echo "==> Instalando dependencias de las Lambdas..."
 for dir in insertStudentLambda getEmployeeImagesLambda seedDatabaseLambda; do
   echo "    npm install: lambda/$dir"
