@@ -155,7 +155,7 @@ variable "ec2_desired_capacity" {
 variable "alert_email" {
   description = "Email address for SNS alert subscriptions"
   type        = string
-  default     = "ops@nexacloud.com"
+  default     = ""
 }
 
 # =============================================================================
