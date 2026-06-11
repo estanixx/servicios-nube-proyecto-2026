@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS public.estudiante (
     apellido varchar(50),
     fecha_nacimiento date,
     direccion varchar(100),
-    correo_electronico varchar(100),
+    correo_electronico varchar(100) UNIQUE,
     carrera varchar(50)
 );
 
@@ -31,4 +31,4 @@ VALUES
     ('Andrea',    'Ramírez',    '1997-10-12', 'Calle 1111, Ciudad',   'andrea@example.com',    'Ingeniería Civil'),
     ('Hugo',      'González',   '1996-03-28', 'Avenida 8888, Ciudad', 'hugo@example.com',      'Historia del Arte'),
     ('Silvia',    'Pérez',      '2002-01-08', 'Calle 4444, Ciudad',   'silvia@example.com',    'Biomedicina')
-ON CONFLICT DO NOTHING;
+ON CONFLICT (correo_electronico) DO NOTHING;
