@@ -33,7 +33,7 @@ resource "aws_launch_template" "nexacloud" {
     s3_lambda_url   = "https://${aws_api_gateway_rest_api.nexacloud.id}.execute-api.${var.aws_region}.amazonaws.com/prod/images"
     db_lambda_url   = "https://${aws_api_gateway_rest_api.nexacloud.id}.execute-api.${var.aws_region}.amazonaws.com/prod/estudiante"
     api_key         = random_password.api_key.result
-    load_balancer_url = "http://${aws_lb.nexacloud.dns_name}"
+    load_balancer_url = "http://${aws_lb.nexacloud.dns_name}/whoami"
   }))
 
   metadata_options {
