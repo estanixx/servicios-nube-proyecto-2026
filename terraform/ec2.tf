@@ -23,7 +23,18 @@ resource "aws_launch_template" "nexacloud" {
 
   vpc_security_group_ids = [aws_security_group.ec2.id]
 
-  user_data = base64encode(templatefile("${path.module}/user_data.sh", {}))
+  user_data = base64encode(templatefile("${path.module}/user_data.sh", {
+    app_repo_url    = var.app_repo_url
+    company_name    = var.project_name
+    db_user         = var.rds_username
+    db_password     = var.rds_password
+    db_host         = aws_db_instance.main.address
+    db_database     = var.rds_db_name
+    s3_lambda_url   = "https://${aws_api_gateway_rest_api.nexacloud.id}.execute-api.${var.aws_region}.amazonaws.com/prod/images"
+    db_lambda_url   = "https://${aws_api_gateway_rest_api.nexacloud.id}.execute-api.${var.aws_region}.amazonaws.com/prod/estudiante"
+    api_key         = random_password.api_key.result
+    load_balancer_url = "http://${aws_lb.nexacloud.dns_name}"
+  }))
 
   metadata_options {
     http_endpoint = "enabled"
