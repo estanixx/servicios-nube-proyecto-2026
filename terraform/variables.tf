@@ -129,6 +129,11 @@ variable "ec2_instance_type" {
   default     = "t3.micro"
 }
 
+variable "ec2_key_pair" {
+  description = "EC2 Key Pair name for SSH access"
+  type        = string
+  default     = "ec2-key"
+}
 
 variable "ec2_min_size" {
   description = "Minimum number of EC2 instances in ASG"

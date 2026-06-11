@@ -16,11 +16,11 @@ resource "aws_launch_template" "nexacloud" {
   name_prefix   = "${local.name_prefix}-"
   image_id      = data.aws_ami.amazon_linux_2023.image_id
   instance_type = var.ec2_instance_type
-
+  key_name      = var.ec2_key_pair
   iam_instance_profile {
     arn = aws_iam_instance_profile.ec2.arn
   }
-
+  update_default_version = true
   vpc_security_group_ids = [aws_security_group.ec2.id]
 
   user_data = base64encode(templatefile("${path.module}/user_data.sh", {
@@ -32,7 +32,7 @@ resource "aws_launch_template" "nexacloud" {
     db_database     = var.rds_db_name
     s3_lambda_url   = "https://${aws_api_gateway_rest_api.nexacloud.id}.execute-api.${var.aws_region}.amazonaws.com/prod/images"
     db_lambda_url   = "https://${aws_api_gateway_rest_api.nexacloud.id}.execute-api.${var.aws_region}.amazonaws.com/prod/estudiante"
-    api_key         = random_password.api_key.result
+    api_key         = aws_api_gateway_api_key.nexacloud.value
     load_balancer_url = "http://${aws_lb.nexacloud.dns_name}/whoami"
   }))
 
@@ -90,7 +90,15 @@ resource "aws_autoscaling_group" "nexacloud" {
     version = "$Latest"
   }
 
-  health_check_grace_period = 60
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      min_healthy_percentage = 50
+    }
+    triggers = ["launch_template"]
+  }
+
+  health_check_grace_period = 120
   health_check_type         = "ELB"
   wait_for_capacity_timeout = "10m"
   termination_policies      = ["OldestInstance"]

@@ -57,8 +57,16 @@ resource "aws_db_instance" "main" {
   }
 }
 
+resource "random_string" "suffix" {
+  length  = 8
+  upper   = true
+  lower   = true
+  numeric = true
+  special = false # Set to true if you want to allow special characters
+}
+
 resource "aws_secretsmanager_secret" "rds_credentials" {
-  name                    = "${local.name_prefix}-rds-credentials"
+  name                    = "${local.name_prefix}-rds-credentials-${random_string.suffix.result}"
   description             = "RDS PostgreSQL master credentials for ${local.name_prefix}"
   recovery_window_in_days = 0
 

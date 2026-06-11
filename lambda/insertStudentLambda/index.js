@@ -1,17 +1,7 @@
 const { Client } = require('pg');
 
 exports.handler = async (event) => {
-    // API Key validation
-    const apiKey = event.headers['x-api-key'];
-    if (!apiKey || apiKey !== process.env.API_KEY) {
-        return {
-            statusCode: 403,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ error: 'Forbidden: Invalid or missing API Key' })
-        };
-    }
+
 
     // Only allow POST
     if (event.httpMethod !== 'POST') {

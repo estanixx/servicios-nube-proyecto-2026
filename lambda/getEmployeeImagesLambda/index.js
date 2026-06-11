@@ -4,17 +4,6 @@ const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const s3Client = new S3Client();
 
 exports.handler = async (event) => {
-    // API Key validation
-    const apiKey = event.headers['x-api-key'];
-    if (!apiKey || apiKey !== process.env.API_KEY) {
-        return {
-            statusCode: 403,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ error: 'Forbidden: Invalid or missing API Key' })
-        };
-    }
 
     // Only allow GET
     if (event.httpMethod !== 'GET') {

@@ -399,5 +399,5 @@ terraform/terraform.tfstate.backup
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
-
+terraform/prod.hcl
 # End of https://www.toptal.com/developers/gitignore/api/terraform,python,node,react,nextjs

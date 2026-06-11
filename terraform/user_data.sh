@@ -10,7 +10,12 @@ swapon /swapfile
 
 dnf update -y
 dnf install -y nodejs npm nginx git stress
+sudo dnf install postgresql15 -y
 
+# Cambiar puerto SSH a 2222 (requerido por security group)
+echo "Hola"
+sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config
+systemctl restart sshd
 # Instance ID para header X-Server-ID
 TOKEN=$(curl -sX PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id || hostname)

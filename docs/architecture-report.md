@@ -20,6 +20,8 @@ This document describes the AWS infrastructure architecture for NexaCloud's pilo
 
 ---
 
+![Diagrama en blanco(2).png](./diagram.png)
+
 ## Architecture Overview
 
 ### Network Topology
