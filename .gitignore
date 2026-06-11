@@ -112,6 +112,7 @@ web_modules/
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
 .env.local
 
 # parcel-bundler cache (https://parceljs.org/)
@@ -389,8 +390,10 @@ terraform/*.zip
 # Terraform backend config with real credentials (use backend.tf.example as template)
 terraform/backend.tf
 
-# Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
-# example: *tfplan*
+# Terraform plan output y estado local (contienen secrets)
+*tfplan*
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
 
 # Ignore CLI configuration files
 .terraformrc
