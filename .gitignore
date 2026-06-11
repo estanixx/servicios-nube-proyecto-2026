@@ -1,8 +1,6 @@
 # Created by https://www.toptal.com/developers/gitignore/api/terraform,python,node,react,nextjs
 # Edit at https://www.toptal.com/developers/gitignore?templates=terraform,python,node,react,nextjs
 
-# Imágenes locales (se suben al bucket S3 con scripts/upload-images.sh)
-assets/
 
 ### NextJS ###
 # dependencies
