@@ -29,6 +29,23 @@ server {
         add_header Content-Type text/plain;
     }
 
+    location /whoami {
+        default_type text/html;
+        return 200 '<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>NexaCloud - Servidor</title>
+<style>body{font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;background:#f0f4f8;}
+.card{background:white;padding:2rem 3rem;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.1);text-align:center;}
+h1{color:#2d3748;margin-bottom:0.5rem;}
+.server-id{font-size:1.5rem;font-weight:bold;color:#3182ce;background:#ebf8ff;padding:0.5rem 1rem;border-radius:8px;margin-top:1rem;}</style>
+</head>
+<body><div class="card">
+<h1>NexaCloud Intranet</h1>
+<p>Este contenido es servido por:</p>
+<div class="server-id">$INSTANCE_ID</div>
+</div></body></html>';
+    }
+
     location / {
         proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;
