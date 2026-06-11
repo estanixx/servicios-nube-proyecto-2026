@@ -287,7 +287,7 @@ output "api_gateway_api_key" {
 
 output "lambda_api_key" {
   description = "API Key que las Lambdas validan en el header x-api-key"
-  value       = random_password.api_key.result
+  value       = aws_api_gateway_api_key.nexacloud.value
   sensitive   = true
 }
 

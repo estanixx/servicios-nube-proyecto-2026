@@ -81,6 +81,10 @@ resource "aws_api_gateway_deployment" "nexacloud" {
     redeployment = sha1(jsonencode([
       aws_api_gateway_resource.estudiante.id,
       aws_api_gateway_resource.images.id,
+      aws_api_gateway_method.estudiante_post.api_key_required,
+      aws_api_gateway_method.images_get.api_key_required,
+      aws_api_gateway_integration.estudiante_lambda.uri,
+      aws_api_gateway_integration.images_lambda.uri,
     ]))
   }
 

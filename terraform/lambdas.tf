@@ -6,11 +6,6 @@
 #   cd lambda/getEmployeeImagesLambda && npm install
 #   cd lambda/seedDatabaseLambda && npm install
 
-resource "random_password" "api_key" {
-  length  = 32
-  special = false
-}
-
 # -----------------------------------------------------------------------------
 # Packaging
 # -----------------------------------------------------------------------------
@@ -54,7 +49,7 @@ resource "aws_lambda_function" "insert_student" {
 
   environment {
     variables = {
-      API_KEY     = random_password.api_key.result
+      API_KEY     = aws_api_gateway_api_key.nexacloud.value
       DB_HOST     = aws_db_instance.main.address
       DB_PORT     = tostring(var.rds_port)
       DB_NAME     = var.rds_db_name
@@ -94,7 +89,7 @@ resource "aws_lambda_function" "serve_images" {
   environment {
     variables = {
       S3_BUCKET_NAME = aws_s3_bucket.employee_images.bucket
-      API_KEY        = random_password.api_key.result
+      API_KEY        = aws_api_gateway_api_key.nexacloud.value
     }
   }
 
