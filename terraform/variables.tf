@@ -117,6 +117,12 @@ variable "rds_storage_type" {
 # =============================================================================
 
 
+variable "app_repo_url" {
+  description = "Git repository URL para desplegar la app Next.js en EC2"
+  type        = string
+  default     = "https://github.com/estanixx/servicios-nube-proyecto-2026.git"
+}
+
 variable "ec2_instance_type" {
   description = "EC2 instance type"
   type        = string
