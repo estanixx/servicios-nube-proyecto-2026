@@ -4,10 +4,6 @@ set -e
 dnf update -y
 dnf install -y nginx
 
-# Cambiar puerto SSH a 2222 (requerido por security group)
-sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config
-systemctl restart sshd
-
 # Get instance ID from IMDS
 INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id 2>/dev/null || echo "unknown")
 

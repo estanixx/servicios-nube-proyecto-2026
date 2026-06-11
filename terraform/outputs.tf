@@ -96,10 +96,6 @@ output "private_route_table_2_id" {
 # Security Group Outputs
 # -----------------------------------------------------------------------------
 
-output "ssh_security_group_id" {
-  description = "ID of the SSH security group"
-  value       = aws_security_group.ssh.id
-}
 
 output "lambda_security_group_id" {
   description = "ID of the Lambda security group"

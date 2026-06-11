@@ -16,7 +16,6 @@ resource "aws_launch_template" "nexacloud" {
   name_prefix   = "${local.name_prefix}-"
   image_id      = data.aws_ami.amazon_linux_2023.image_id
   instance_type = var.ec2_instance_type
-  key_name      = var.ec2_key_pair
 
   iam_instance_profile {
     arn = aws_iam_instance_profile.ec2.arn
