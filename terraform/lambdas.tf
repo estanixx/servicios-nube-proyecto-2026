@@ -6,7 +6,6 @@
 #   cd lambda/getEmployeeImagesLambda && npm install
 #   cd lambda/seedDatabaseLambda && npm install
 
-
 # -----------------------------------------------------------------------------
 # Packaging
 # -----------------------------------------------------------------------------
