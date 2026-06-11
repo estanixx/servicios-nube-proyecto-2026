@@ -96,10 +96,6 @@ output "private_route_table_2_id" {
 # Security Group Outputs
 # -----------------------------------------------------------------------------
 
-output "ssh_security_group_id" {
-  description = "ID of the SSH security group"
-  value       = aws_security_group.ssh.id
-}
 
 output "lambda_security_group_id" {
   description = "ID of the Lambda security group"
@@ -286,6 +282,12 @@ output "api_gateway_prod_stage_url" {
 output "api_gateway_api_key" {
   description = "API Key for accessing the API Gateway"
   value       = aws_api_gateway_api_key.nexacloud.value
+  sensitive   = true
+}
+
+output "lambda_api_key" {
+  description = "API Key que las Lambdas validan en el header x-api-key"
+  value       = random_password.api_key.result
   sensitive   = true
 }
 

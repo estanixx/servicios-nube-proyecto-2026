@@ -1,48 +1,14 @@
 # =============================================================================
-# Security Groups
+# Security Groups - SSH, Lambda, RDS, ALB, EC2
 # =============================================================================
 
-# -----------------------------------------------------------------------------
-# SSH Security Group (non-default port 2222)
-# -----------------------------------------------------------------------------
-
-resource "aws_security_group" "ssh" {
-  name        = "${local.name_prefix}-ssh-sg"
-  description = "Security group for SSH access on non-default port from office IP"
-  vpc_id      = aws_vpc.main.id
-
-  ingress {
-    description = "SSH from office IP"
-    from_port   = var.ssh_port
-    to_port     = var.ssh_port
-    protocol    = "tcp"
-    cidr_blocks = [var.office_ip]
-  }
-
-  egress {
-    description = "Allow all outbound"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "${local.name_prefix}-ssh-sg"
-  }
-}
-
-# -----------------------------------------------------------------------------
-# Lambda Security Group
-# -----------------------------------------------------------------------------
 
 resource "aws_security_group" "lambda" {
   name        = "${local.name_prefix}-lambda-sg"
-  description = "Security group for Lambda functions in private subnets"
+  description = "Lambda functions in private subnets"
   vpc_id      = aws_vpc.main.id
 
   egress {
-    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -54,16 +20,11 @@ resource "aws_security_group" "lambda" {
   }
 }
 
-# -----------------------------------------------------------------------------
-# RDS Security Group
-# -----------------------------------------------------------------------------
-
 resource "aws_security_group" "rds" {
   name        = "${local.name_prefix}-rds-sg"
-  description = "Security group for RDS PostgreSQL access from Lambda and VPC resources"
+  description = "RDS PostgreSQL access from Lambda and VPC"
   vpc_id      = aws_vpc.main.id
 
-  # Allow inbound from VPC CIDR (Lambda and EC2 instances)
   ingress {
     description = "PostgreSQL from VPC CIDR"
     from_port   = var.rds_port
@@ -72,7 +33,6 @@ resource "aws_security_group" "rds" {
     cidr_blocks = [var.vpc_cidr]
   }
 
-  # Allow inbound from Lambda security group itself (for Lambda functions)
   ingress {
     description     = "PostgreSQL from Lambda SG"
     from_port       = var.rds_port
@@ -82,7 +42,6 @@ resource "aws_security_group" "rds" {
   }
 
   egress {
-    description = "Allow all outbound"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -91,5 +50,63 @@ resource "aws_security_group" "rds" {
 
   tags = {
     Name = "${local.name_prefix}-rds-sg"
+  }
+}
+
+resource "aws_security_group" "alb" {
+  name        = "${local.name_prefix}-alb-sg"
+  description = "Internet-facing Application Load Balancer"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description = "HTTP from internet"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "HTTPS from internet"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
+  }
+
+  tags = {
+    Name = "${local.name_prefix}-alb-sg"
+  }
+}
+
+resource "aws_security_group" "ec2" {
+  name        = "${local.name_prefix}-ec2-sg"
+  description = "EC2 instances behind ALB"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description = "HTTP from ALB"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${local.name_prefix}-ec2-sg"
   }
 }

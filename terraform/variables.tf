@@ -2,11 +2,6 @@
 # Variables - NexaCloud AWS Infrastructure
 # =============================================================================
 
-variable "office_ip" {
-  description = "Office IP CIDR for SSH access"
-  type        = string
-  default     = "152.203.67.246/32"
-}
 
 variable "project_name" {
   description = "Project name for resource naming and tags"
@@ -65,7 +60,7 @@ variable "rds_port" {
 variable "rds_engine_version" {
   description = "PostgreSQL engine version"
   type        = string
-  default     = "16.9"
+  default     = "16.14"
 }
 
 variable "rds_instance_class" {
@@ -116,26 +111,16 @@ variable "rds_storage_type" {
   default     = "gp3"
 }
 
-# =============================================================================
-# Security Group Configuration
-# =============================================================================
-
-variable "ssh_port" {
-  description = "Non-default SSH port"
-  type        = number
-  default     = 2222
-}
 
 # =============================================================================
 # EC2 Configuration
 # =============================================================================
 
-# Note: ec2_ami_id is kept for reference but launch template now uses data source
-# data "aws_ami" "amazon_linux_2023" to find the latest AL2023 AMI
-variable "ec2_ami_id" {
-  description = "AMI ID for EC2 instances (deprecated - now uses data source)"
+
+variable "app_repo_url" {
+  description = "Git repository URL para desplegar la app Next.js en EC2"
   type        = string
-  default     = "" # No default - should use data source or provide explicit AMI
+  default     = "https://github.com/estanixx/servicios-nube-proyecto-2026.git"
 }
 
 variable "ec2_instance_type" {
@@ -144,11 +129,6 @@ variable "ec2_instance_type" {
   default     = "t3.micro"
 }
 
-variable "ec2_key_pair" {
-  description = "EC2 key pair name for SSH access"
-  type        = string
-  default     = "nexacloud-key"
-}
 
 variable "ec2_min_size" {
   description = "Minimum number of EC2 instances in ASG"
@@ -175,7 +155,7 @@ variable "ec2_desired_capacity" {
 variable "alert_email" {
   description = "Email address for SNS alert subscriptions"
   type        = string
-  default     = "ops@nexacloud.com"
+  default     = ""
 }
 
 # =============================================================================
