@@ -55,12 +55,7 @@ exports.handler = async (event) => {
                     Bucket: bucketName,
                     Key: obj.Key
                 });
-                const url = await getSignedUrl(s3Client, getCommand, { expiresIn: 3600 });
-                return {
-                    key: obj.Key,
-                    url: url,
-                    lastModified: obj.LastModified
-                };
+                return getSignedUrl(s3Client, getCommand, { expiresIn: 3600 });
             })
         );
 
