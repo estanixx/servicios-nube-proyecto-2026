@@ -2,59 +2,20 @@
 set -euxo pipefail
 exec > >(tee /var/log/nexacloud-user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
 
+# Swap de 1GB para evitar OOM durante npm build en t3.micro
+fallocate -l 1G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+
 dnf update -y
 dnf install -y nodejs npm nginx git
 
-# Instance ID for X-Server-ID header
+# Instance ID para header X-Server-ID
 TOKEN=$(curl -sX PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id || hostname)
 
-# Clone and build app
-APP_DIR=/opt/nexacloud
-rm -rf "$APP_DIR"
-git clone "${app_repo_url}" "$APP_DIR"
-cd "$APP_DIR"
-npm ci
-
-cat > "$APP_DIR/.env.production" <<ENV
-COMPANY_NAME=${company_name}
-DB_USER=${db_user}
-DB_PASSWORD=${db_password}
-DB_HOST=${db_host}
-DB_DATABASE=${db_database}
-AWS_S3_LAMBDA_URL=${s3_lambda_url}
-AWS_S3_LAMBDA_APIKEY=${api_key}
-AWS_DB_LAMBDA_URL=${db_lambda_url}
-AWS_DB_LAMBDA_APIKEY=${api_key}
-STRESS_PATH=/usr/bin/stress
-LOAD_BALANCER_URL=${load_balancer_url}
-ENV
-
-npm run build
-
-# Systemd service
-cat > /etc/systemd/system/nexacloud.service <<'SERVICE'
-[Unit]
-Description=NexaCloud Next.js
-After=network-online.target
-Wants=network-online.target
-
-[Service]
-Type=simple
-WorkingDirectory=/opt/nexacloud
-Environment=PORT=3000
-Environment=NODE_ENV=production
-ExecStart=/usr/bin/npm start
-Restart=always
-RestartSec=10
-StandardOutput=append:/var/log/nexacloud-app.log
-StandardError=append:/var/log/nexacloud-app.log
-
-[Install]
-WantedBy=multi-user.target
-SERVICE
-
-# Nginx reverse proxy
+# Nginx arranca primero para que los health checks pasen mientras se hace el build
 cat > /etc/nginx/conf.d/nexacloud.conf <<NGINX
 server {
     listen 80 default_server;
@@ -82,7 +43,54 @@ server {
 NGINX
 
 rm -f /etc/nginx/conf.d/default.conf
-systemctl daemon-reload
-systemctl enable nexacloud nginx
-systemctl start nexacloud
+systemctl enable nginx
 systemctl start nginx
+
+# Clonar repo y hacer build
+APP_DIR=/opt/nexacloud
+rm -rf "$APP_DIR"
+git clone "${app_repo_url}" "$APP_DIR"
+cd "$APP_DIR"
+npm ci
+
+cat > "$APP_DIR/.env.production" <<ENV
+COMPANY_NAME=${company_name}
+DB_USER=${db_user}
+DB_PASSWORD=${db_password}
+DB_HOST=${db_host}
+DB_DATABASE=${db_database}
+AWS_S3_LAMBDA_URL=${s3_lambda_url}
+AWS_S3_LAMBDA_APIKEY=${api_key}
+AWS_DB_LAMBDA_URL=${db_lambda_url}
+AWS_DB_LAMBDA_APIKEY=${api_key}
+STRESS_PATH=/usr/bin/stress
+LOAD_BALANCER_URL=${load_balancer_url}
+ENV
+
+NODE_OPTIONS="--max_old_space_size=512" npm run build
+
+# Systemd service para Next.js
+cat > /etc/systemd/system/nexacloud.service <<'SERVICE'
+[Unit]
+Description=NexaCloud Next.js
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/nexacloud
+Environment=PORT=3000
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/npm start
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/nexacloud-app.log
+StandardError=append:/var/log/nexacloud-app.log
+
+[Install]
+WantedBy=multi-user.target
+SERVICE
+
+systemctl daemon-reload
+systemctl enable nexacloud
+systemctl start nexacloud
